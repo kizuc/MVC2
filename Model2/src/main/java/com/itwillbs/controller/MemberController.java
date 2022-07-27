@@ -203,17 +203,11 @@ public class MemberController extends HttpServlet{
 				
 			}
 			
-		}else if(substringPath.equals("deleteForm.me")) {
+		}else if(substringPath.equals("/deleteForm.me")) {
 			RequestDispatcher dispatcher=request.getRequestDispatcher("member/deleteForm.jsp");
 			dispatcher.forward(request, response);
-			HttpSession session=request.getSession();
-			// 세션값 생성
-			String id=(String)session.getAttribute("id");
 			
-			MemberService memberService=new MemberService();
-			MemberDTO memberDTO=memberService.getMember(id);
-			
-		}else if(substringPath.equals("deletePro.me")) {
+		}else if(substringPath.equals("/deletePro.me")) {
 			System.out.println("회원정보 삭제");
 
 			String id=request.getParameter("id");
