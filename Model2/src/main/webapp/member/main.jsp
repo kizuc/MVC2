@@ -11,7 +11,7 @@
 String id=(String)session.getAttribute("id");
 // 세션값이 없으면(세션값이 null이면) loginForm.jsp 이동
 if(id==null){
-// 	response.sendRedirect("loginForm.jsp");
+	response.sendRedirect("loginForm.me");
 }
 %>
 <%=id %>님 로그인 하셨습니다.<br>

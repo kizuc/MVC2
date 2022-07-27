@@ -1,12 +1,17 @@
 package com.itwillbs.controller;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
+import com.itwillbs.domain.MemberDTO;
+import com.itwillbs.service.MemberService;
 
 // web.xml에서 지정한 서블릿(처리담당자)
 public class MemberController extends HttpServlet{
@@ -58,6 +63,28 @@ public class MemberController extends HttpServlet{
 			
 		}else if(substringPath.equals("/insertPro.me")) { // 일치할 경우, 실제주소로 이동
 			System.out.println("/insertPro.me");
+			// post request 한글처리
+			request.setCharacterEncoding("utf-8");
+			// 지금은 수작업으로 하지만 Spring에서는 자동으로 된다(파라미터 값 가져오기)
+			// request = > 파라미터값 가져오기 => MemberDTO 저장
+			// 처리 작업을 호출할 거야 => 처리 작업을 따로 만들 거야
+			String id=request.getParameter("id");
+			String pass=request.getParameter("pass");
+			String name=request.getParameter("name");
+			// 날짜는 따로 적어줘야해서 현재 없음
+			MemberDTO memberDTO = new MemberDTO();
+			memberDTO.setId(id);
+			memberDTO.setPass(pass);
+			memberDTO.setName(name);
+			
+			// 서블릿(주소매핑) => 처리작업(MemberService) => 디비작업(MemberDAO)
+			// 처리작업은 자바파일의 메서드를 호출해주면 되는데 ~
+			// 패키지 com.itwillbs.service	파일이름 MemberService
+			// 패키지 com.itwillbs.dao		파일이름 MemberDAO
+			
+			MemberService memberService=new MemberService();
+			memberService.insertPro(memberDTO);
+			
 			System.out.println("회원가입 처리");
 			// loginForm.me 주소가 변강되면서 이동 (insertPro.me에서 loginForm.me로 가려면 주소가 바뀌어야 한다)
 			response.sendRedirect("loginForm.me");
@@ -68,12 +95,56 @@ public class MemberController extends HttpServlet{
 			
 		}else if(substringPath.equals("/loginPro.me")) {
 			System.out.println("로그인 처리");
+			
+			String id=request.getParameter("id");
+			String pass=request.getParameter("pass");
+			
+			MemberService memberService=new MemberService();
+			MemberDTO memberDTO=memberService.userCheck(id,pass);
+			if(memberDTO!=null) {	// null이 아니면 
+				// 아이디 비밀번호 일치
+				// 세션 내장객체 생성
+				HttpSession session=request.getSession();
+				// 세션값 생성
+				session.setAttribute("id", id);
+				// main.me 이동
+				
+			}else {	
+				// 아이디 비밀번호 틀림
+				// 뒤로 이동
+				// response 응답정보를 받아 setContentType 내용을 html 타입으로~
+				// 사용자에게 응답하러 갈 때 html로 응답하겠다!
+				response.setContentType("text/html; charset=UTF-8");
+				// response에 글을 쓸 건데 printWriter에 둬서 응답한 걸 출력하겠다!
+				PrintWriter out=response.getWriter();
+				out.println("<script>");
+				out.println("alert('입력하신 정보 틀림');");
+				out.println("history.back();");
+				out.println("</script>");
+				out.close();
+				
+			}
+			
+			
 			// 가상주소 main.me의 메인으로 이동
 			response.sendRedirect("main.me");
 		}else if(substringPath.equals("/main.me")) {
 			RequestDispatcher dispatcher=request.getRequestDispatcher("member/main.jsp");
 			dispatcher.forward(request, response);
 		}else if(substringPath.equals("/info.me")) {
+			System.out.println("회원정보조회");
+			// 세션 내장객체 생성
+			HttpSession session=request.getSession();
+			// 세션값 생성
+			String id=(String)session.getAttribute("id");
+			
+			MemberService memberService=new MemberService();
+			MemberDTO memberDTO=memberService.getMember(id);
+			
+			// memberDTO를 request에 담아서 저장
+//			request.setAttribute("이름", 값);
+			request.setAttribute("memberDTO", memberDTO);
+			
 			RequestDispatcher dispatcher=request.getRequestDispatcher("member/info.jsp");
 			dispatcher.forward(request, response);
 		}else if(substringPath.equals("/updateForm.me")) {
@@ -87,6 +158,12 @@ public class MemberController extends HttpServlet{
 			dispatcher.forward(request, response);
 		}else if(substringPath.equals("deletePro.me")) {
 			System.out.println("회원정보 삭제");
+			response.sendRedirect("main.me");
+		}else if(substringPath.equals("/logout.me")) {
+			// 세션 내장객체 생성
+			HttpSession session=request.getSession();
+			// 세션값 초기화
+			session.invalidate();
 			response.sendRedirect("main.me");
 		}
 	
