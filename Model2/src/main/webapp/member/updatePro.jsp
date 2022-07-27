@@ -1,5 +1,5 @@
-<%@page import="member.MemberDTO"%>
-<%@page import="member.MemberDAO"%>
+<%@page import="com.itwillbs.domain.MemberDTO"%>
+<%@page import="com.itwillbs.dao.MemberDAO"%>
 <%@page import="java.sql.ResultSet"%>
 <%@page import="java.sql.PreparedStatement"%>
 <%@page import="java.sql.Connection"%>
@@ -39,7 +39,7 @@ if(memberDTO!=null){
 	memberDAO.updateMember(updateDTO);
 
 	// main.jsp 이동
-	response.sendRedirect("main.jsp");
+	response.sendRedirect("main.me");
 }else{
 	// else  memberDTO ==null => 아이디 비밀번호 틀림
 //  // 아이디 비밀번호 틀림메시지 출력 , 뒤로이동

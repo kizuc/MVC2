@@ -108,7 +108,6 @@ public class MemberController extends HttpServlet{
 				// 세션값 생성
 				session.setAttribute("id", id);
 				// main.me 이동
-				
 			}else {	
 				// 아이디 비밀번호 틀림
 				// 뒤로 이동
@@ -125,12 +124,12 @@ public class MemberController extends HttpServlet{
 				
 			}
 			
-			
 			// 가상주소 main.me의 메인으로 이동
 			response.sendRedirect("main.me");
 		}else if(substringPath.equals("/main.me")) {
 			RequestDispatcher dispatcher=request.getRequestDispatcher("member/main.jsp");
 			dispatcher.forward(request, response);
+			
 		}else if(substringPath.equals("/info.me")) {
 			System.out.println("회원정보조회");
 			// 세션 내장객체 생성
@@ -148,17 +147,108 @@ public class MemberController extends HttpServlet{
 			RequestDispatcher dispatcher=request.getRequestDispatcher("member/info.jsp");
 			dispatcher.forward(request, response);
 		}else if(substringPath.equals("/updateForm.me")) {
+			
+			HttpSession session=request.getSession();
+			// 세션값 생성
+			String id=(String)session.getAttribute("id");
+			
+			MemberService memberService=new MemberService();
+			MemberDTO memberDTO=memberService.getMember(id);
+			
+			// memberDTO를 request에 담아서 저장
+//			request.setAttribute("이름", 값);
+			request.setAttribute("memberDTO", memberDTO);
+			
 			RequestDispatcher dispatcher=request.getRequestDispatcher("member/updateForm.jsp");
 			dispatcher.forward(request, response);
 		}else if(substringPath.equals("/updatePro.me")) {
 			System.out.println("회원정보 수정");
-			response.sendRedirect("main.me");
+			
+			// post request 한글처리
+			request.setCharacterEncoding("utf-8");
+
+			String id=request.getParameter("id");
+			String pass=request.getParameter("pass");
+			String name=request.getParameter("name");
+			
+			MemberService memberService=new MemberService();
+			MemberDTO memberDTO=memberService.userCheck(id,pass);
+			if(memberDTO!=null) {	// null이 아니면 
+				// 아이디 비밀번호 일치
+				// 수정할 정보를 MemberDTO updateDTO 객체 생성
+				// set메서드 호출해 수정할 정보 저장
+				MemberDTO updateDTO=new MemberDTO();
+				updateDTO.setId(id);
+				updateDTO.setPass(pass);
+				updateDTO.setName(name);
+				
+				// 수정 작업
+				memberService.updateMember(updateDTO);
+				
+				// main.me 이동
+				response.sendRedirect("main.me");
+			}else {	
+				// 아이디 비밀번호 틀림
+				// 뒤로 이동
+				// response 응답정보를 받아 setContentType 내용을 html 타입으로~
+				// 사용자에게 응답하러 갈 때 html로 응답하겠다!
+				response.setContentType("text/html; charset=UTF-8");
+				// response에 글을 쓸 건데 printWriter에 둬서 응답한 걸 출력하겠다!
+				PrintWriter out=response.getWriter();
+				out.println("<script>");
+				out.println("alert('입력하신 정보 틀림');");
+				out.println("history.back();");
+				out.println("</script>");
+				out.close();
+				
+			}
+			
 		}else if(substringPath.equals("deleteForm.me")) {
 			RequestDispatcher dispatcher=request.getRequestDispatcher("member/deleteForm.jsp");
 			dispatcher.forward(request, response);
+			HttpSession session=request.getSession();
+			// 세션값 생성
+			String id=(String)session.getAttribute("id");
+			
+			MemberService memberService=new MemberService();
+			MemberDTO memberDTO=memberService.getMember(id);
+			
 		}else if(substringPath.equals("deletePro.me")) {
 			System.out.println("회원정보 삭제");
-			response.sendRedirect("main.me");
+
+			String id=request.getParameter("id");
+			String pass=request.getParameter("pass");
+			
+			MemberService memberService=new MemberService();
+			MemberDTO memberDTO=memberService.userCheck(id,pass);
+			if(memberDTO!=null) {	// null이 아니면 
+				// 아이디 비밀번호 일치
+				// 삭제 작업
+				memberService.deleteMember(id);
+				// 세션 내장객체 생성
+				HttpSession session=request.getSession();
+				// 세션값 초기화
+				session.invalidate();
+				
+				// main.me 이동
+				response.sendRedirect("main.me");
+			}else {	
+				// 아이디 비밀번호 틀림
+				// 뒤로 이동
+				// response 응답정보를 받아 setContentType 내용을 html 타입으로~
+				// 사용자에게 응답하러 갈 때 html로 응답하겠다!
+				response.setContentType("text/html; charset=UTF-8");
+				// response에 글을 쓸 건데 printWriter에 둬서 응답한 걸 출력하겠다!
+				PrintWriter out=response.getWriter();
+				out.println("<script>");
+				out.println("alert('입력하신 정보 틀림');");
+				out.println("history.back();");
+				out.println("</script>");
+				out.close();
+				
+			}
+			
+			
 		}else if(substringPath.equals("/logout.me")) {
 			// 세션 내장객체 생성
 			HttpSession session=request.getSession();

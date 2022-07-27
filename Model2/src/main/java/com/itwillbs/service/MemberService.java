@@ -21,7 +21,7 @@ public class MemberService {
 	
 // memberDTO memberDTO=memberSerice.userCheck(id,pass);
 	public MemberDTO userCheck(String id, String pass) {
-		System.out.println("MemberService Usercheck()");
+		System.out.println("MemberService userCheck()");
 		
 		MemberDAO memberDAO=new MemberDAO();
 		MemberDTO memberDTO=memberDAO.userCheck(id, pass);
@@ -30,15 +30,31 @@ public class MemberService {
 	
 // memerDTO memberDTO=memberSerice.getMember(id);
 	public MemberDTO getMember(String id) {
+		System.out.println("MemberService getMember()");
+		
 		MemberDAO memberDAO=new MemberDAO();
 		MemberDTO memberDTO=memberDAO.getMember(id);
 		return memberDTO;
 	}
 	
 // memerDTO memberDTO=memberSerice.updateMember(updateDTO);	
-	public MemberDTO updateMember(MemberDTO updateDTO) {
+	public void updateMember(MemberDTO updateDTO) {
+		System.out.println("MemberService updateMember()");
+		//디비작업  MemberDAO 객체생성
+		//    메서드호출()
 		MemberDAO memberDAO=new MemberDAO();
-		MemberDTO memberDTO=memberDAO.updateMember(updateDTO);
-		return memberDTO;
+		memberDAO.updateMember(updateDTO);
 	}
+	
+// memerDTO memberDTO=memberSerice.deleteMember(id);
+	public void deleteMember(String id) {
+		System.out.println("MemberService deleteMember()");
+		
+		MemberDAO memberDAO=new MemberDAO();
+		memberDAO.deleteMember(id);
+	}
+	
+	
+	
+	
 }

@@ -169,4 +169,25 @@ public class MemberDAO {
 		}
 		
 	}
+	
+	public void deleteMember(String id) {
+		Connection con = null;
+		PreparedStatement pstmt = null;
+		
+		try {
+			con = getConnection();
+			
+			String sql="delete from members where id=?";
+			pstmt = con.prepareStatement(sql);
+			pstmt.setString(1, id);
+			
+			pstmt.executeUpdate();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}finally {
+			if(pstmt!=null)try { pstmt.close(); }catch(SQLException ex){}
+			if(con!=null)try { con.close(); }catch(SQLException ex){}
+			}
+		}
 }
+
